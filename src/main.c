@@ -14,7 +14,7 @@ void microcontroller_task(void *pvParameters)
 
     while (1)
     {
-        if (!send_spi_data(spi, data_to_send, 32))
+        if (!send_spi_data(spi, &data_to_send, 32))
         {
             fprintf(stderr, "Failed to send SPI data\n");
         }
@@ -41,7 +41,7 @@ void FPGA_task(void *pvParameters)
 
     while (1)
     {
-        if (!receive_spi_data(spi, received_data, 32))
+        if (!receive_spi_data(spi, &received_data, 32))
         {
             fprintf(stderr, "Failed to receive SPI data\n");
         }
