@@ -1,40 +1,54 @@
-#include "main.h"
+#include <main.h>
 
+/**
+ * @brief Task for microcontroller SPI communication
+ *
+ * @param pvParameters Task parameters (not used)
+ */
 void microcontroller_task(void *pvParameters)
 {
     spi_device_handle_t spi;
-    init(&spi, CSPIN, GPIO_NUM_19, GPIO_NUM_23, GPIO_NUM_18);
+    init(&spi, MC_CSPIN, MC_MISO, MC_MOSI, MC_SCLK);
 
-    const uint32_t data_to_send[4] = {0x12, 0x34, 0x56, 0x78};
-    uint32_t received_data[4] = {0};
+    const uint32_t data_to_send = {0x12, 0x34, 0x56, 0x78}; // [144 188; 222 240] in decimal
 
     while (1)
     {
-        if (!send_spi_data(spi, data_to_send, 4))
+        if (!send_spi_data(spi, data_to_send, 32))
         {
             fprintf(stderr, "Failed to send SPI data\n");
         }
+        else
+        {
+            fprintf(stdout, "Microcontroller sent data successfully\n");
+        }
 
-        vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for 1 second
+        vTaskDelay(portMAX_DELAY); // Delay indefinitely
     }
 }
 
+/**
+ * @brief Task for FPGA SPI communication
+ *
+ * @param pvParameters Task parameters (not used)
+ */
 void FPGA_task(void *pvParameters)
 {
     spi_device_handle_t spi;
-    init(&spi, FPGA_CSPIN, GPIO_NUM_19, GPIO_NUM_23, GPIO_NUM_18);
+    init(&spi, FPGA_CSPIN, FPGA_MISO, FPGA_MOSI, FPGA_SCLK);
 
-    const uint32_t data_to_send[4] = {0x9A, 0xBC, 0xDE, 0xF0};
-    uint32_t received_data[4] = {0};
+    uint32_t received_data;
 
     while (1)
     {
-        if (!send_spi_data(spi, data_to_send, 4))
+        if (!receive_spi_data(spi, received_data, 32))
         {
-            fprintf(stderr, "Failed to send SPI data\n");
+            fprintf(stderr, "Failed to receive SPI data\n");
         }
-
-        vTaskDelay(pdMS_TO_TICKS(1000)); // Delay for 1 second
+        else
+        {
+            fprintf(stdout, "FPGA received data successfully\n");
+        }
     }
 }
 
