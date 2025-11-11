@@ -1,6 +1,8 @@
 #pragma once
 
 #include "test.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 #define MC_CSPIN GPIO_NUM_10
 #define MC_MISO GPIO_NUM_13
 #define MC_MOSI GPIO_NUM_11

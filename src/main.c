@@ -1,5 +1,8 @@
 #include <main.h>
 
+TaskHandle_t mc;
+TaskHandle_t fpga;
+
 /**
  * @brief Task for microcontroller SPI communication
  *
@@ -10,7 +13,7 @@ void microcontroller_task(void *pvParameters)
     spi_device_handle_t spi;
     init(&spi, MC_CSPIN, MC_MISO, MC_MOSI, MC_SCLK);
 
-    const uint32_t data_to_send = {0x12, 0x34, 0x56, 0x78}; // [144 188; 222 240] in decimal
+    const uint32_t data_to_send = {0x12, 0x34, 0x56, 0x78};
 
     while (1)
     {
@@ -49,11 +52,29 @@ void FPGA_task(void *pvParameters)
         {
             fprintf(stdout, "FPGA received data successfully\n");
         }
+        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
 void app_main()
 {
-    xTaskCreate(microcontroller_task, "Microcontroller Task", 4096, NULL, 5, NULL);
-    xTaskCreate(FPGA_task, "FPGA Task", 4096, NULL, 5, NULL);
+    // Microcontroller task pinned to core 0
+    xTaskCreatePinnedToCore(
+        microcontroller_task,
+        "Microcontroller Task",
+        4096,
+        NULL,
+        1,
+        &mc,
+        0);
+
+    // FPGA task pinned to core 1
+    xTaskCreatePinnedToCore(
+        FPGA_task,
+        "FPGA Task",
+        4096,
+        NULL,
+        1,
+        &fpga,
+        1);
 }
