@@ -13,7 +13,7 @@ void microcontroller_task(void *pvParameters)
     spi_device_handle_t spi;
     init(&spi, MC_CSPIN, MC_MISO, MC_MOSI, MC_SCLK);
 
-    const uint32_t data_to_send = {0x12, 0x34, 0x56, 0x78};
+    const uint32_t data_to_send = 0xFFFFFFFF;
 
     while (1)
     {

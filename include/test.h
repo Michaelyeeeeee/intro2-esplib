@@ -3,6 +3,7 @@
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 #define BAUDRATE 1000000
 
